@@ -1,0 +1,8 @@
+<h2>こんにちは<%= @user[0]['name'] %>さん</h2>
+<form action="/posts" method="post">
+  <label for="title">タイトル</label>
+  <input type="text" name="title" id="title">
+  <label for="content">内容</label>
+  <input type="text" name="content" id="content">
+  <input type="submit">
+</form>

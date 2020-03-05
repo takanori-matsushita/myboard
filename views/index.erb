@@ -1,0 +1,18 @@
+<table>
+  <tr>
+    <td>投稿ID</td>
+    <td>投稿者</td>
+    <td>タイトル</td>
+    <td>内容</td>
+  </tr>
+  <% @posts.each do |post| %>
+  <tr>
+    <td><%= post['id'] %></td>
+    <td><%= post['name'] %></td>
+    <td><%= post['title'] %></td>
+    <td><%= post['content'] %></td>
+  </tr>
+  <% end %>
+</table>
+<a href="/form">投稿画面へ</a>
+<a href="/logout">ログアウト</a>
