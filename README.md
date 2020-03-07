@@ -1,7 +1,13 @@
 # 簡易掲示板
 CODEBASE受講生向けの簡易掲示板サンプル
  
-## データベース構築
+## データベースについて
+ 
+### ER図
+ひとまず簡易掲示板なので、以下のような構成にする。
+<img width="621" alt="mybord_table" src="https://user-images.githubusercontent.com/56256994/76152344-e7339380-6101-11ea-9458-c1ddf7a9d21a.png">
+issueにコメントを残す予定。
+
 動作の確認をしたい方は、以下のSQL文を実行して下さい。
 ```
 CREATE DATABASE myboard;
@@ -33,7 +39,7 @@ CREATE TABLE posts(
 CREATE TABLE follower(
   id SERIAL NOT NULL PRIMARY KEY,
   following INTEGER NOT NULL,
-  followed INTEGER NOT NULL,
+  followers INTEGER NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 )

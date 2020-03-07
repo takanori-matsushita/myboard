@@ -56,9 +56,14 @@ post '/login' do
   email = params[:email]
   password = params[:password]
   user = db.exec_params("select * from users where email = $1 and password = $2",[email, password]).first
-  session[:id] = user['id']
-  session[:notice] = {key: "success", message: "ログインしました"}
-  redirect '/posts'
+  if user
+    session[:id] = user['id']
+    session[:notice] = {key: "success", message: "ログインしました"}
+    redirect '/posts'
+  else
+    session[:notice] = {key: "danger", message: "メールアドレスかパスワードが間違っています"}
+    redirect '/login'
+  end
 end
 
 get '/logout' do
@@ -158,7 +163,7 @@ get '/mypage/:id/edit' do
 end
 
 post'/mypage/:id/update' do
-
+  
 end
 
 get '/search' do
