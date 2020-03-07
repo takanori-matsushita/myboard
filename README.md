@@ -5,8 +5,9 @@ CODEBASE受講生向けの簡易掲示板サンプル
  
 ### ER図
 ひとまず簡易掲示板なので、以下のような構成にする。
-<img width="621" alt="mybord_table" src="https://user-images.githubusercontent.com/56256994/76152344-e7339380-6101-11ea-9458-c1ddf7a9d21a.png">
+<img width="621" alt="mybord_table" src="https://user-images.githubusercontent.com/56256994/76152344-e7339380-6101-11ea-9458-c1ddf7a9d21a.png">  
 issueにコメントを残す予定。
+# 1
 
 動作の確認をしたい方は、以下のSQL文を実行して下さい。
 ```
