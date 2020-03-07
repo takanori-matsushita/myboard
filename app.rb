@@ -79,13 +79,13 @@ end
 post '/create' do
   title = params[:title]
   content = params[:content]
-  if !params[:image].empty?
+  if params[:image].empty?
+    db.exec_params("insert into posts(title, content, user_id) values($1, $2, $3, $4)",[title, content, session[:id]])
+  else
     image_name = params[:image][:filename]
     image_data = params[:image][:tempfile]
     FileUtils.mv(image_data, "./public/images/#{image_name}")
     db.exec_params("insert into posts(title, content, image, user_id) values($1, $2, $3, $4)",[title, content, image_name, session[:id]])
-  else
-    db.exec_params("insert into posts(title, content, user_id) values($1, $2, $3, $4)",[title, content, session[:id]])
   end
   session[:notice] = {key: "primary", message: "新規投稿しました"}
   redirect '/posts'
@@ -111,13 +111,13 @@ post '/posts/:id/update' do
   id = params[:id]
   title = params[:title]
   content = params[:content]
-  if !params[:image].empty?
+  if params[:image].empty?
+    db.exec_params("update posts set title = $1, content = $2 where id = $3", [title, content, id])
+  else
     image_name = params[:image][:filename]
     image_data = params[:image][:tempfile]
     FileUtils.mv(image_data, "./public/images/#{image_name}")
     db.exec_params("update posts set title = $1, content = $2, image = $3 where id = $4", [title, content, image_name, id])
-  else
-    db.exec_params("update posts set title = $1, content = $2 where id = $3", [title, content, id])
   end
   session[:notice] = {key: "success", message: "投稿を更新しました"}
   redirect "posts/#{id}"
@@ -125,6 +125,11 @@ end
 
 get '/posts/:id/destroy' do
   id = params[:id]
+  @post = db.exec_params("select * from posts where id = $1", [id]).first
+  if session[:id] != @post['user_id']
+    session[:notice] = {key: "warning", message: "アクセス権限がありません"}
+    redirect '/posts' 
+  end
   db.exec_params("delete from posts where id = $1", [id])
   session[:notice] = {key: "danger", message: "投稿を削除しました"}
   redirect '/posts'
@@ -139,4 +144,10 @@ get '/users/:id' do
   id = params['id']
   @user = db.exec_params("select * from users where id = $1", [id]).first
   erb :user
+end
+
+get '/mypage' do
+  id = params['id']
+  @user = db.exec_params("select * from users where id = $1", [id]).first
+  erb :mypage
 end
