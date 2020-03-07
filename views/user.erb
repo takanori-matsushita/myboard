@@ -1,3 +1,21 @@
 <% @viewTitle = "ユーザー詳細" %>
-<%= @user['name'] %>
-<a href="/user/<%= @user['id'] %>/edit" class="btn btn-info">編集</a>
+<div class="row">
+  <div class="col-3">
+    <h2 class="text-center"><%= @user['name'] %></h2>
+    <img src="<%= @user['image'] %>" class="rounded-circle img-fluid">
+  </div>
+  <div class="col-6 offset-3">
+    <dl>
+      <dt>誕生日</dt>
+      <% if @user['birthday'].nil? %>
+      <dd>非公開</dd>
+      <% else %>
+      <dd><%= @user['birthday'] %></dd>
+      <% end %>
+      <dt>自己紹介</dt>
+      <dd><%= @user['introduce'] %></dd>
+      <dt>登録日</dt>
+      <dd><%= @user['created_at'] %></dd>
+    </dl>
+  </div>
+</div>

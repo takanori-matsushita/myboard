@@ -13,7 +13,7 @@ CREATE TABLE users(
   email VARCHAR(50) NOT NULL,
   password VARCHAR(20) NOT NULL,
   image VARCHAR(20) DEFAULT '/images/no-image.jpg',
-  introduce VARCHAR(20),
+  introduce VARCHAR(20) DEFAULT 'よろしくお願いします。',
   birthday DATE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP

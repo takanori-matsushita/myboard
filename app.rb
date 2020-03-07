@@ -20,7 +20,7 @@ before do
     session[:notice] = {key: "danger", message: "ログインして下さい"}
     redirect '/login'
   end
-  @user = db.exec_params("select * from users where id = $1",[session[:id]]).first
+  @admin = db.exec_params("select * from users where id = $1",[session[:id]]).first
   @message = session.delete :notice
 end
 
@@ -111,7 +111,8 @@ post '/posts/:id/update' do
   id = params[:id]
   title = params[:title]
   content = params[:content]
-  if params[:image].empty?
+  binding.pry
+  if params[:image].nil?
     db.exec_params("update posts set title = $1, content = $2 where id = $3", [title, content, id])
   else
     image_name = params[:image][:filename]
@@ -136,18 +137,31 @@ get '/posts/:id/destroy' do
 end
 
 get '/users' do
-  @users = db.exec_params("select * from users")
+  @users = db.exec_params("select * from users where not id = $1", [session[:id]])
   erb :users
 end
 
 get '/users/:id' do
+  redirect 'mypage' if params['id'] == session[:id]
   id = params['id']
-  @user = db.exec_params("select * from users where id = $1", [id]).first
+  @user = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [id]).first
   erb :user
 end
 
 get '/mypage' do
-  id = params['id']
-  @user = db.exec_params("select * from users where id = $1", [id]).first
+  @user = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [session[:id]]).first
   erb :mypage
+end
+
+get '/mypage/:id/edit' do
+  
+end
+
+post'/mypage/:id/update' do
+
+end
+
+get '/search' do
+  @searches = db.exec_params("select * from posts where title like $1 or content like $1", ["%#{params[:search]}%"])
+  erb :search
 end
