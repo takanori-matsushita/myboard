@@ -1,8 +1,17 @@
-<form action="/login" method="post">
-  <label for="email">メールアドレス</label>
-  <input type="text" name="email" id="email">
-  <label for="password">パスワード</label>
-  <input type="text" name="password" id="password">
-  <input type="submit" value="ログイン">
-</form>
-<a href="/signup">新規登録はこちら</a>
+<div class="row">
+  <div class="col-sm-6 col-lg-6 offset-3 p-5">
+    <h2 class="text-center mb-3">ログイン</h2>
+    <form action="/login" method="post">
+      <div class="form-group">
+        <label for="email">メールアドレス</label>
+        <input type="text" class="form-control" name="email" id="email">
+      </div>
+      <div class="form-group">
+        <label for="password">パスワード</label>
+        <input type="password" class="form-control" name="password" id="password">
+      </div>
+      <button type="submit" class="btn btn-success">ログイン</button>
+      <a href="/signup" class="btn btn-primary">新規登録</a>
+    </form>
+  </div>
+</div>

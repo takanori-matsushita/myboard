@@ -1,0 +1,13 @@
+<div class="d-flex justify-content-between mb-5">
+  <h2 class="mb-3">投稿詳細</h2>
+  <% if @post['user_id'] == session[:id] %>
+  <div>
+    <a class="btn btn-success" href="/posts/<%= @post['id'] %>/edit">編集</a>
+    <a class="btn btn-danger" href="/posts/<%= @post['id'] %>/destroy" onclick="return confirm('本当に削除しますか？')">削除</a>
+  </div>
+  <% end %>
+</div>
+<h3 class="mb-3"><%= @post['title'] %></h3>
+<img src="/images/<%= @post['image'] %>" class="img-fluid">
+<p><%= @post['content'] %></p>
+<p class="text-right">投稿者:<a href="/users/<%= @post['user_id'] %>"><%= @post['name'] %></a></p>
