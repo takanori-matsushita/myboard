@@ -12,3 +12,4 @@
 <img src="/images/<%= @post['image'] %>" class="img-fluid">
 <p><%= @post['content'] %></p>
 <p class="text-right">投稿者:<a href="/users/<%= @post['user_id'] %>"><%= @post['name'] %></a></p>
+<p class="text-right"><%= @post['updated_at'] %></p>
