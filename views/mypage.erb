@@ -1,8 +1,8 @@
 <% @viewTitle = "マイページ" %>
 <div class="row">
   <div class="col-3">
+    <img src="/images/<%= @admin['image'] %>" class="rounded-circle img-fluid mb-3">
     <h2 class="text-center"><%= @admin['name'] %></h2>
-    <img src="/images/<%= @admin['image'] %>" class="rounded-circle img-fluid">
   </div>
   <div class="col-6 offset-3">
     <dl>

@@ -160,11 +160,8 @@ post '/mypage/update' do
   password = params[:password]
   birthday = params[:birthday]
   introduce = params[:introduce]
-  binding.pry
   begin
-    # db.exec_params("update users set name = $1, email = $2, password = $3 birthday = $4, introduce = $5 where id = $6", [name, email, password, birthday, introduce, session[:id]]) if params[:image].nil? && password
-    # db.exec_params("update users set name = $1, email = $2, birthday = $3, introduce = $4 where id = $5", [name, email, birthday, introduce, session[:id]]) if params[:image].nil? && password.nil?
-    if params[:image].empty?
+    if params[:image].nil?
       if password.empty?
         db.exec_params("update users set name = $1, email = $2, birthday = $3, introduce = $4 where id = $5", [name, email, birthday, introduce, session[:id]])
       else
@@ -196,7 +193,6 @@ get '/search' do
     next if keyword == ""
     @searches[i] = db.exec_params("select * from posts where title like $1 or content like $1", ["%#{keyword}%"]).first
   end
-  binding.pry
   @searches.uniq!
   erb :search
 end
