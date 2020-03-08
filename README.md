@@ -101,10 +101,10 @@ app.rbの`enable :sessions`の下の設定を自身のPCの環境へ変更。
 ```
 def db
   PG::connect(
-    :host => '', #今回はローカル環境なのでlocalhost
-    :user => '', #ターミナルでwhoamiを実行し表示されたユーザー名
-    :password => '', #接続時のパスワード今回は設定しないので、空白
-    :dbname => '' #作成したデータベース名
+    host: '', #今回はローカル環境なのでlocalhost
+    user: '', #ターミナルでwhoamiを実行し表示されたユーザー名
+    password: '', #接続時のパスワード今回は設定しないので、空白
+    dbname: '' #作成したデータベース名
   ) 
 end
 ```
@@ -120,10 +120,10 @@ Sinatraで環境変数を使うには、ENVという記述で対応できる。
 ```
 def db
   PG::connect(
-    :host => ENV['DB_HOST'],
-    :user => ENV['DB_USER'],
-    :password => ENV['DB_PASSWORD'],
-    :dbname => ENV['DB_NAME']
+    host: ENV['DB_HOST'],
+    user: ENV['DB_USER'],
+    password: ENV['DB_PASSWORD'],
+    dbname: ENV['DB_NAME']
   ) 
 end
 ```
