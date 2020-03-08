@@ -81,11 +81,11 @@ get '/posts/new' do
   erb :post_new
 end
 
-post '/create' do
+post '/posts/create' do
   title = params[:title]
   content = params[:content]
-  if params[:image].empty?
-    db.exec_params("insert into posts(title, content, user_id) values($1, $2, $3, $4)",[title, content, session[:id]])
+  if params[:image].nil?
+    db.exec_params("insert into posts(title, content, user_id) values($1, $2, $3)",[title, content, session[:id]])
   else
     image_name = params[:image][:filename]
     image_data = params[:image][:tempfile]
@@ -167,6 +167,14 @@ post'/mypage/:id/update' do
 end
 
 get '/search' do
-  @searches = db.exec_params("select * from posts where title like $1 or content like $1", ["%#{params[:search]}%"])
+  redirect '/posts' if params[:search].empty?
+  keywords = params[:search].split(/[[:blank:]]+/)
+  @searches = []
+  keywords.each_with_index do |keyword, i|
+    next if keyword == ""
+    @searches[i] = db.exec_params("select * from posts where title like $1 or content like $1", ["%#{keyword}%"]).first
+  end
+  binding.pry
+  @searches.uniq!
   erb :search
 end
