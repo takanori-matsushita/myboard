@@ -15,5 +15,5 @@
     <label class="custom-file-label" for="image" data-browse="選択">画像を選択して下さい</label>
   </div>
   <button type="submit" class="btn btn-success my-3">更新</button>
-  <button type="reset" class="btn btn-danger">リセット</button>
+  <a href="/posts/<%= @post['id'] %>" class="btn btn-danger" onclick="return confirm('編集を保存せずに戻りますか？')">戻る</a>
 </form>
