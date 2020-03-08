@@ -32,10 +32,12 @@
     <p class="text-right"><%= @post['updated_at'] %></p>
   </div>
 </div>
-<div class="row bg-white p-3">
-  <div class="col-12">
+<div class="row bg-white p-3 mb-5">
+  <div class="col-10 offset-1">
     <form action="/comment/<%= @post['id'] %>" method="post">
       <div class="form-group">
+        <input type="hidden" name="post_id" value="<%= @post['id'] %>">
+        <input type="hidden" name="user_id" value="<%= session[:id] %>">
         <label for="content">コメント</label>
         <textarea type="text" name="content" id="content" class="form-control mb-3"></textarea>
         <button type="submit" class="btn btn-info">送信</button>
@@ -44,13 +46,18 @@
   </div>
 </div>
 <div class="row">
-  <div class="col-12">
-    @array = []
-    @searches.each do |search|
-    search.each do |s|
-    @array += s
-    end
-    end
-
+  <div class="col-8 offset-2">
+    <ul class="list-unstyled">
+      <% @comments.each do |comment| %>
+      <li class="media border-bottom border-secondary mb-5">
+        <img src="/images/<%= comment['image'] %>" width="100" class="mr-3 rounded-circle">
+        <div class="media-body">
+          <p><%= comment['name'] %></p>
+          <p><%= comment['content'] %></p>
+          <p class="text-right"><%= comment['created_at'] %></p>
+        </div>
+      </li>
+      <% end %>
+    </ul>
   </div>
 </div>

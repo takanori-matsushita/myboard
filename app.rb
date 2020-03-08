@@ -73,7 +73,7 @@ end
 # 投稿機能
 ###########################################################################
 get '/posts' do
-  @posts = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts join users on users.id = posts.user_id")
+  @posts = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts inner join users on users.id = posts.user_id")
   erb :posts
 end
 
@@ -98,16 +98,25 @@ end
 
 get '/posts/:id' do
   id = params[:id]
-  @post = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts join users on users.id = posts.user_id where posts.id = $1", [id]).first
+  @post = db.exec_params("
+    select posts.id, users.name, posts.title, posts.content, posts.image, posts.created_at, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
+    inner join users on users.id = posts.user_id
+    where posts.id = $1", [id]
+  ).first
   @like_count = db.exec_params("select count(*) from likes where post_id = $1", [id]).first
   @liked = db.exec_params("select * from likes where user_id = $1 and post_id = $2", [session[:id], id]).first
-  @comments = db.exec_params("select * from comments join users on comments.user_id = users.id where post_id = $1", [id])
+  @comments = db.exec_params("
+    select comments.id, comments.post_id, users.name, users.image, comments.content, to_char(comments.created_at, 'yyyy/mm/dd hh24:mm:ss') as created_at from comments
+    inner join users on comments.user_id = users.id
+    inner join posts on comments.post_id = posts.id
+    where post_id = $1
+    order by created_at desc", [id])
   erb :post
 end
 
 get '/posts/:id/edit' do
   id = params[:id]
-  @post = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts join users on users.id = posts.user_id where posts.id = $1", [id]).first
+  @post = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts inner join users on users.id = posts.user_id where posts.id = $1", [id]).first
   if session[:id] != @post['user_id']
     session[:notice] = {key: "warning", message: "アクセス権限がありません"}
     redirect '/posts' 
@@ -146,7 +155,11 @@ end
 # コメント機能
 ###########################################################################
 post '/comment/:id' do
-
+  post_id = params[:post_id]
+  user_id = params[:user_id]
+  content = params[:content]
+  db.exec_params("insert into comments(post_id, user_id, content) values($1, $2, $3)", [post_id, user_id, content])
+  redirect "/posts/#{post_id}"
 end
 
 # いいね機能
@@ -247,7 +260,7 @@ get '/search' do
     next if keyword == ""
     array = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from posts where title like $1 or content like $1", ["%#{keyword}%"])
     array.each do |a|
-      @results.push(a)
+      @results << a
     end
   end
   @url = request.fullpath
