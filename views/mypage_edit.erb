@@ -27,5 +27,5 @@
     <textarea class="form-control" name="introduce" id="introduce"><%= @admin['introduce'] %></textarea>
   </div>
   <button type="submit" class="btn btn-success">更新</button>
-  <a href="/mypage" class="btn btn-danger">戻る</a>
+  <a href="/mypage" class="btn btn-danger" onclick="return confirm('本当に戻りますか？')">戻る</a>
 </form>

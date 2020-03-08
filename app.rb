@@ -73,7 +73,11 @@ end
 # 投稿機能
 ###########################################################################
 get '/posts' do
-  @posts = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts inner join users on users.id = posts.user_id")
+  @posts = db.exec_params("
+    select posts.id, posts.user_id, users.name, posts.title, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
+    inner join users on users.id = posts.user_id
+    order by updated_at desc
+    ")
   erb :posts
 end
 
@@ -99,7 +103,7 @@ end
 get '/posts/:id' do
   id = params[:id]
   @post = db.exec_params("
-    select posts.id, users.name, posts.title, posts.content, posts.image, posts.created_at, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
+    select posts.id, posts.user_id, users.name, posts.title, posts.content, posts.image, posts.created_at, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
     inner join users on users.id = posts.user_id
     where posts.id = $1", [id]
   ).first
@@ -179,7 +183,10 @@ end
 # ユーザー情報
 ###########################################################################
 get '/users' do
-  @users = db.exec_params("select * from users where not id = $1", [session[:id]])
+  @users = db.exec_params("select * from users where not id = $1 order by created_at desc", [session[:id]])
+  @anyfollowed = db.exec_params("select followed, count(followed) as count_followed from followers group by followed")
+  @anyfollowing = db.exec_params("select following, count(following) as count_following from followers group by following")
+  binding.pry
   erb :users
 end
 
@@ -190,7 +197,6 @@ get '/users/:id' do
   @followed = db.exec_params("select count(*) from followers where followed = $1", [id]).first
   @following = db.exec_params("select count(*) from followers where following = $1", [id]).first
   @follow = db.exec_params("select * from followers where following = $1 and followed = $2", [session[:id], id]).first
-  binding.pry
   erb :user
 end
 
