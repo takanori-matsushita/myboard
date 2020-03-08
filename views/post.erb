@@ -32,3 +32,25 @@
     <p class="text-right"><%= @post['updated_at'] %></p>
   </div>
 </div>
+<div class="row bg-white p-3">
+  <div class="col-12">
+    <form action="/comment/<%= @post['id'] %>" method="post">
+      <div class="form-group">
+        <label for="content">コメント</label>
+        <textarea type="text" name="content" id="content" class="form-control mb-3"></textarea>
+        <button type="submit" class="btn btn-info">送信</button>
+      </div>
+    </form>
+  </div>
+</div>
+<div class="row">
+  <div class="col-12">
+    @array = []
+    @searches.each do |search|
+    search.each do |s|
+    @array += s
+    end
+    end
+
+  </div>
+</div>

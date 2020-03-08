@@ -8,10 +8,10 @@ enable :sessions
 
 def db
   PG::connect(
-    :host => ENV['DB_HOST'],
-    :user => ENV['DB_USER'],
-    :password => ENV['DB_PASSWORD'],
-    :dbname => ENV['DB_NAME']
+    host: ENV['DB_HOST'],
+    user: ENV['DB_USER'],
+    password: ENV['DB_PASSWORD'],
+    dbname: ENV['DB_NAME']
   ) 
 end
 
@@ -100,7 +100,8 @@ get '/posts/:id' do
   id = params[:id]
   @post = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts join users on users.id = posts.user_id where posts.id = $1", [id]).first
   @like_count = db.exec_params("select count(*) from likes where post_id = $1", [id]).first
-  @liked = db.exec_params("select * from likes where user_id = $1", [session[:id]]).first
+  @liked = db.exec_params("select * from likes where user_id = $1 and post_id = $2", [session[:id], id]).first
+  @comments = db.exec_params("select * from comments join users on comments.user_id = users.id where post_id = $1", [id])
   erb :post
 end
 
@@ -140,6 +141,12 @@ get '/posts/:id/destroy' do
   db.exec_params("delete from posts where id = $1", [id])
   session[:notice] = {key: "danger", message: "投稿を削除しました"}
   redirect '/posts'
+end
+
+# コメント機能
+###########################################################################
+post '/comment/:id' do
+
 end
 
 # いいね機能
@@ -234,10 +241,14 @@ end
 get '/search' do
   success '/posts' if params[:q].empty?
   @keywords = params[:q].split(/[[:blank:]]+/)
-  @searches = []
-  @keywords.each_with_index do |keyword, i|
+  # @array = []
+  @results = []
+  @keywords.each_with_index do |keyword|
     next if keyword == ""
-    @searches[i] = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from posts where title like $1 or content like $1", ["%#{keyword}%"])
+    array = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from posts where title like $1 or content like $1", ["%#{keyword}%"])
+    array.each do |a|
+      @results.push(a)
+    end
   end
   @url = request.fullpath
   erb :search
