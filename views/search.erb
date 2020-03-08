@@ -1,6 +1,18 @@
+<% if @search %>
 <% @searches.each_with_index do |s| %>
-<%= s['title'] %>
-<%= s['content'] %>
-<%= s['image'] %>
-<%= s['created_at'] %>
+<ul class="list-unstyled">
+  <li class="media">
+    <a href="/posts/<%= s['id'] %>">
+      <img src="/images/<%= s['image'] %>" class="img-fluid align-self-center mr-3" style="max-width:200px">
+    </a>
+    <div class="media-body">
+      <h5 class="mt-0 mb-1"><%= s['title'] %></h5>
+      <p><%= s['content'] %></p>
+      投稿日:<%= s['created_at'] %>
+    </div>
+  </li>
+</ul>
+<% end %>
+<% else %>
+検索したキーワードでは記事を見つけることができませんでした。
 <% end %>

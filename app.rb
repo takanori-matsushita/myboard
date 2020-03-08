@@ -186,13 +186,12 @@ post '/mypage/update' do
 end
 
 get '/search' do
-  success '/posts' if params[:search].empty?
-  keywords = params[:search].split(/[[:blank:]]+/)
+  success '/posts' if params[:q].empty?
+  @keywords = params[:q].split(/[[:blank:]]+/)
   @searches = []
-  keywords.each_with_index do |keyword, i|
+  @keywords.each_with_index do |keyword, i|
     next if keyword == ""
-    @searches[i] = db.exec_params("select * from posts where title like $1 or content like $1", ["%#{keyword}%"]).first
+    @searches[i] = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from posts where title like $1 or content like $1", ["%#{keyword}%"]).first
   end
-  @searches.uniq!
   erb :search
 end
