@@ -15,6 +15,8 @@ def db
   ) 
 end
 
+# 共通の処理
+###########################################################################
 before do
   unless request.path == '/login' || request.path == '/signup' || session[:id]
     session[:notice] = {key: "danger", message: "ログインして下さい"}
@@ -24,10 +26,8 @@ before do
   @message = session.delete :notice
 end
 
-before '/edit/*' do
-  
-end
-
+# サインアップ処理
+###########################################################################
 get '/signup' do
   erb :signup
 end
@@ -42,6 +42,8 @@ post '/signup' do
   redirect '/posts'
 end
 
+# ログイン処理
+###########################################################################
 get '/login' do
   erb :login
 end
@@ -60,12 +62,16 @@ post '/login' do
   end
 end
 
+# ログアウト処理
+###########################################################################
 get '/logout' do
   session.clear
   session[:notice] = {key: "danger", message: "ログアウトしました"}
   redirect '/login'
 end
 
+# 投稿機能
+###########################################################################
 get '/posts' do
   @posts = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts join users on users.id = posts.user_id")
   erb :posts
@@ -93,6 +99,8 @@ end
 get '/posts/:id' do
   id = params[:id]
   @post = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts join users on users.id = posts.user_id where posts.id = $1", [id]).first
+  @like = db.exec_params("select count(*) from likes where post_id = $1", [id]).first
+  @liked = db.exec_params("select * from likes where user_id = $1", [session[:id]]).first
   erb :post
 end
 
@@ -134,6 +142,22 @@ get '/posts/:id/destroy' do
   redirect '/posts'
 end
 
+# いいね機能
+###########################################################################
+post '/likes' do
+  user_id = session[:id]
+  post_id = params[:id]
+  like = db.exec_params("select * from likes where user_id = $1 and post_id = $2", [user_id, post_id]).first 
+  if like
+    db.exec_params("delete from likes where id = $1", [like['id']])
+  else
+    db.exec_params("insert into likes(user_id, post_id) values($1, $2)", [user_id, post_id])
+  end
+  redirect "/posts/#{post_id}"
+end
+
+# ユーザー情報
+###########################################################################
 get '/users' do
   @users = db.exec_params("select * from users where not id = $1", [session[:id]])
   erb :users
@@ -146,6 +170,8 @@ get '/users/:id' do
   erb :user
 end
 
+# マイページ
+###########################################################################
 get '/mypage' do
   erb :mypage
 end
@@ -185,6 +211,8 @@ post '/mypage/update' do
   redirect '/mypage'
 end
 
+# 検索機能
+###########################################################################
 get '/search' do
   success '/posts' if params[:q].empty?
   @keywords = params[:q].split(/[[:blank:]]+/)

@@ -9,7 +9,28 @@
   <% end %>
 </div>
 <h3 class="mb-3"><%= @post['title'] %></h3>
-<img src="/images/<%= @post['image'] %>" class="img-fluid">
+<img src="/images/<%= @post['image'] %>" class="img-fluid mb-3">
 <p><%= @post['content'] %></p>
-<p class="text-right">投稿者:<a href="/users/<%= @post['user_id'] %>"><%= @post['name'] %></a></p>
-<p class="text-right"><%= @post['updated_at'] %></p>
+<div class="row">
+  <div class="col-sm-4 offset-4">
+    <div class="d-flex flex-column align-items-center">
+      <form action="/likes" method="post">
+        <input type="hidden" name="id" value="<%= @post['id'] %>">
+        <% if @liked %>
+        <a href="javascript:void(0)" onclick="this.parentNode.submit()">
+          <i class="fas fa-heart fa-2x" style="color: red;"></i>
+        </a>
+        <% else %>
+        <a href="javascript:void(0)" onclick="this.parentNode.submit()">
+          <i class="far fa-heart fa-2x" style="color: red;"></i>
+        </a>
+        <% end %>
+      </form>
+      <span><%= @like['count'] %></span>
+    </div>
+  </div>
+  <div class="col-sm-4">
+    <p class="text-right">投稿者:<a href="/users/<%= @post['user_id'] %>"><%= @post['name'] %></a></p>
+    <p class="text-right"><%= @post['updated_at'] %></p>
+  </div>
+</div>

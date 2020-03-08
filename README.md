@@ -61,8 +61,8 @@ CREATE TABLE followers(
 ```
 CREATE TABLE comments(
   id SERIAL NOT NULL PRIMARY KEY,
-  posts_id INTEGER NOT NULL,
-  users_id INTEGER NOT NULL,
+  post_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
   content VARCHAR(255) NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
@@ -72,7 +72,7 @@ CREATE TABLE comments(
 CREATE TABLE likes(
   id SERIAL NOT NULL PRIMARY KEY,
   user_id INTEGER NOT NULL,
-  posts_id INTEGER NOT NULL
+  post_id INTEGER NOT NULL
 );
 ```
 #### 
