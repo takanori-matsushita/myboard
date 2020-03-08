@@ -1,8 +1,8 @@
 <% @viewTitle = "ユーザー詳細" %>
 <div class="row">
   <div class="col-3">
+    <img src="/images/<%= @user['image'] %>" class="rounded-circle img-fluid">
     <h2 class="text-center"><%= @user['name'] %></h2>
-    <img src="<%= @user['image'] %>" class="rounded-circle img-fluid">
   </div>
   <div class="col-6 offset-3">
     <dl>

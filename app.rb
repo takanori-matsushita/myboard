@@ -99,7 +99,7 @@ end
 get '/posts/:id' do
   id = params[:id]
   @post = db.exec_params("select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts join users on users.id = posts.user_id where posts.id = $1", [id]).first
-  @like = db.exec_params("select count(*) from likes where post_id = $1", [id]).first
+  @like_count = db.exec_params("select count(*) from likes where post_id = $1", [id]).first
   @liked = db.exec_params("select * from likes where user_id = $1", [session[:id]]).first
   erb :post
 end
@@ -147,8 +147,8 @@ end
 post '/likes' do
   user_id = session[:id]
   post_id = params[:id]
-  like = db.exec_params("select * from likes where user_id = $1 and post_id = $2", [user_id, post_id]).first 
-  if like
+  liked = db.exec_params("select * from likes where user_id = $1 and post_id = $2", [user_id, post_id]).first 
+  if liked
     db.exec_params("delete from likes where id = $1", [like['id']])
   else
     db.exec_params("insert into likes(user_id, post_id) values($1, $2)", [user_id, post_id])
@@ -166,8 +166,15 @@ end
 get '/users/:id' do
   redirect 'mypage' if params['id'] == session[:id]
   id = params['id']
+  @followed = db.exec_params("select * from followers where following = $1", [id]).first
   @user = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [id]).first
   erb :user
+end
+
+# ユーザー情報
+###########################################################################
+post '/follow' do
+  followed = db.exec_params("select * from followers where following = $1", [id]).first
 end
 
 # マイページ
