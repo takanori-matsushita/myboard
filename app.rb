@@ -191,7 +191,8 @@ get '/search' do
   @searches = []
   @keywords.each_with_index do |keyword, i|
     next if keyword == ""
-    @searches[i] = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from posts where title like $1 or content like $1", ["%#{keyword}%"]).first
+    @searches[i] = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from posts where title like $1 or content like $1", ["%#{keyword}%"])
   end
+  @url = request.fullpath
   erb :search
 end

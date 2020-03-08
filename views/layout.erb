@@ -29,7 +29,7 @@
         </ul>
         <form action="/search" method="get" class="form-inline my-2 my-lg-0 ml-5 mr-auto">
           <input class="form-control mr-sm-2" type="search" name="q" placeholder="Search"
-            value="<%= @keywords.join(" ") %>">
+            <% if request.fullpath == @url %> value="<%= @keywords.join(" ") %>" <% end %>>
           <button class="btn btn-success my-2 my-sm-0" type="submit">検索</button>
         </form>
         <% if session[:id] %>

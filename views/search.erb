@@ -1,5 +1,6 @@
-<% if @search %>
-<% @searches.each_with_index do |s| %>
+<% @searches.each do |array| %>
+<% if array.any? %>
+<% array.each do |s| %>
 <ul class="list-unstyled">
   <li class="media">
     <a href="/posts/<%= s['id'] %>">
@@ -15,4 +16,5 @@
 <% end %>
 <% else %>
 検索したキーワードでは記事を見つけることができませんでした。
+<% end %>
 <% end %>
