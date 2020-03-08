@@ -20,7 +20,7 @@ before do
     session[:notice] = {key: "danger", message: "ログインして下さい"}
     redirect '/login'
   end
-  @admin = db.exec_params("select * from users where id = $1",[session[:id]]).first
+  @admin = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1",[session[:id]]).first
   @message = session.delete :notice
 end
 
@@ -36,13 +36,7 @@ post '/signup' do
   name = params[:name]
   email = params[:email]
   password = params[:password]
-  birthday = params[:birthday]
-  introduce = params[:introduce]
-  if birthday.empty?
-    user = db.exec_params("insert into users(name, email, password, introduce) values($1, $2, $3, $4) returning id",[name, email, password, introduce]).first
-  else
-    user = db.exec_params("insert into users(name, email, password, birthday, introduce) values($1, $2, $3, $4, $5) returning id",[name, email, password, birthday, introduce]).first
-  end
+  user = db.exec_params("insert into users(name, email, password) values($1, $2, $3) returning id",[name, email, password]).first
   session[:id] = user['id']
   session[:notice] = {key: "success", message: "登録が完了しました"}
   redirect '/posts'
@@ -116,7 +110,6 @@ post '/posts/:id/update' do
   id = params[:id]
   title = params[:title]
   content = params[:content]
-  binding.pry
   if params[:image].nil?
     db.exec_params("update posts set title = $1, content = $2 where id = $3", [title, content, id])
   else
@@ -154,20 +147,49 @@ get '/users/:id' do
 end
 
 get '/mypage' do
-  @user = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [session[:id]]).first
   erb :mypage
 end
 
-get '/mypage/:id/edit' do
-  
+get '/mypage/edit' do
+  erb :mypage_edit
 end
 
-post'/mypage/:id/update' do
-  
+post '/mypage/update' do
+  name = params[:name]
+  email = params[:email]
+  password = params[:password]
+  birthday = params[:birthday]
+  introduce = params[:introduce]
+  binding.pry
+  begin
+    # db.exec_params("update users set name = $1, email = $2, password = $3 birthday = $4, introduce = $5 where id = $6", [name, email, password, birthday, introduce, session[:id]]) if params[:image].nil? && password
+    # db.exec_params("update users set name = $1, email = $2, birthday = $3, introduce = $4 where id = $5", [name, email, birthday, introduce, session[:id]]) if params[:image].nil? && password.nil?
+    if params[:image].empty?
+      if password.empty?
+        db.exec_params("update users set name = $1, email = $2, birthday = $3, introduce = $4 where id = $5", [name, email, birthday, introduce, session[:id]])
+      else
+        db.exec_params("update users set name = $1, email = $2, password = $3, birthday = $4, introduce = $5 where id = $6", [name, email, password, birthday, introduce, session[:id]])
+      end
+    else
+      image_name = params[:image][:filename]
+      image_data = params[:image][:tempfile]
+      FileUtils.mv(image_data, "./public/images/#{image_name}")
+      if password.empty?
+        db.exec_params("update users set name = $1, email = $2, birthday = $3, introduce = $4, image = $5 where id = $6", [name, email, birthday, introduce, image_name, session[:id]])
+      else
+        db.exec_params("update users set name = $1, email = $2, password = $3 birthday = $4, introduce = $5, image = $6 where id = $7", [name, email, password, birthday, introduce, image_name, session[:id]])
+      end
+    end
+  rescue PG::UniqueViolation
+    session[:notice] = {key: "danger", message: "そのメールアドレスはすでに利用されています。"}
+    redirect '/mypage/edit'
+  end
+  session[:notice] = {key: "success", message: "プロフィールを更新しました"}
+  redirect '/mypage'
 end
 
 get '/search' do
-  redirect '/posts' if params[:search].empty?
+  success '/posts' if params[:search].empty?
   keywords = params[:search].split(/[[:blank:]]+/)
   @searches = []
   keywords.each_with_index do |keyword, i|

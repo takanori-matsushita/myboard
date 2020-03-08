@@ -1,1 +1,26 @@
 <% @viewTitle = "マイページ" %>
+<div class="row">
+  <div class="col-3">
+    <h2 class="text-center"><%= @admin['name'] %></h2>
+    <img src="/images/<%= @admin['image'] %>" class="rounded-circle img-fluid">
+  </div>
+  <div class="col-6 offset-3">
+    <dl>
+      <dt>メールアドレス</dt>
+      <dd><%= @admin['email'] %></dd>
+      <dt>パスワード</dt>
+      <dd><%= @admin['password'] %></dd>
+      <dt>誕生日</dt>
+      <% if @admin['birthday'].nil? %>
+      <dd>非公開</dd>
+      <% else %>
+      <dd><%= @admin['birthday'] %></dd>
+      <% end %>
+      <dt>自己紹介</dt>
+      <dd><%= @admin['introduce'] %></dd>
+      <dt>登録日</dt>
+      <dd><%= @admin['created_at'] %></dd>
+    </dl>
+    <a href="/mypage/edit" class="btn btn-success">プロフィール編集</a>
+  </div>
+</div>

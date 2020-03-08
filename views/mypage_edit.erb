@@ -1,0 +1,31 @@
+<% @viewTitle = "プロフィール編集" %>
+<h2 class="text-center mb-3">プロフィール編集</h2>
+<form action="/mypage/update" method="post" enctype="multipart/form-data">
+  <div class="form-group">
+    <label for="name">ニックネーム<span class="text-danger">必須</span></label>
+    <input type="text" class="form-control" name="name" id="name" value="<%= @admin['name'] %>" required>
+  </div>
+  <div class="form-group">
+    <label for="email">メールアドレス<span class="text-danger">必須</span></label>
+    <input type="text" class="form-control" name="email" id="email" value="<%= @admin['email'] %>" required>
+  </div>
+  <div class="form-group">
+    <label for="password">パスワード<span class="text-danger">※変更時のみ入力して下さい</span></label>
+    <input type="password" class="form-control" name="password" id="password">
+  </div>
+  <span class="mb-2 d-inline-block">プロフィール画像</span>
+  <div class="custom-file mb-3">
+    <input type="file" name="image" class="custom-file-input" id="image">
+    <label class="custom-file-label" for="image" data-browse="選択">画像を選択して下さい</label>
+  </div>
+  <div class="form-group">
+    <label for="birthday">生年月日</label>
+    <input type="date" class="form-control" name="birthday" id="birthday" value="<%= @admin['birthday'] %>">
+  </div>
+  <div class="form-group">
+    <label for="introduce">自己紹介</label>
+    <textarea class="form-control" name="introduce" id="introduce"><%= @admin['introduce'] %></textarea>
+  </div>
+  <button type="submit" class="btn btn-success">更新</button>
+  <a href="/mypage" class="btn btn-danger">戻る</a>
+</form>

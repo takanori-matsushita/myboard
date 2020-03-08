@@ -28,7 +28,7 @@ CREATE TABLE users(
   name VARCHAR(20) NOT NULL,
   email VARCHAR(50) NOT NULL,
   password VARCHAR(20) NOT NULL,
-  image VARCHAR(20) DEFAULT '/images/no-image.jpg',
+  image VARCHAR(20) DEFAULT 'no-image.jpg',
   introduce VARCHAR(20) DEFAULT 'よろしくお願いします。',
   birthday DATE,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
