@@ -16,15 +16,13 @@
     <div class="d-flex flex-column align-items-center">
       <form action="/likes" method="post">
         <input type="hidden" name="id" value="<%= @post['id'] %>">
-        <% if @liked %>
         <a href="javascript:void(0)" onclick="this.parentNode.submit()">
+          <% if @liked %>
           <i class="fas fa-heart fa-2x" style="color: red;"></i>
-        </a>
-        <% else %>
-        <a href="javascript:void(0)" onclick="this.parentNode.submit()">
+          <% else %>
           <i class="far fa-heart fa-2x" style="color: red;"></i>
+          <% end %>
         </a>
-        <% end %>
       </form>
       <span><%= @like_count['count'] %></span>
     </div>

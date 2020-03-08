@@ -1,8 +1,24 @@
 <% @viewTitle = "ユーザー詳細" %>
 <div class="row">
   <div class="col-3">
-    <img src="/images/<%= @user['image'] %>" class="rounded-circle img-fluid">
-    <h2 class="text-center"><%= @user['name'] %></h2>
+    <img src="/images/<%= @user['image'] %>" class="rounded-circle img-fluid mb-3">
+    <h2 class="text-center mb-3"><%= @user['name'] %></h2>
+    <form action="/follow" method="post" class="text-center">
+      <input type="hidden" name="id" value="<%= @user['id'] %>">
+      <% if @follow %>
+      <a class="btn btn-primary mb-3" href="javascript:void(0)" onclick="this.parentNode.submit()">
+        フォロー解除
+      </a>
+      <% else %>
+      <a class="btn btn-outline-primary mb-3" href="javascript:void(0)" onclick="this.parentNode.submit()">
+        フォロー
+      </a>
+      <% end %>
+    </form>
+    <div class="d-flex flex-column align-items-center">
+      <p><span class="font-weight-bold h3"><%= @following['count'] %></span>フォロー中</p>
+      <p><span class="font-weight-bold h3"><%= @followed['count'] %></span>フォロワー</p>
+    </div>
   </div>
   <div class="col-6 offset-3">
     <dl>

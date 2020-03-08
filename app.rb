@@ -149,7 +149,7 @@ post '/likes' do
   post_id = params[:id]
   liked = db.exec_params("select * from likes where user_id = $1 and post_id = $2", [user_id, post_id]).first 
   if liked
-    db.exec_params("delete from likes where id = $1", [like['id']])
+    db.exec_params("delete from likes where id = $1", [liked['id']])
   else
     db.exec_params("insert into likes(user_id, post_id) values($1, $2)", [user_id, post_id])
   end
@@ -166,15 +166,26 @@ end
 get '/users/:id' do
   redirect 'mypage' if params['id'] == session[:id]
   id = params['id']
-  @followed = db.exec_params("select * from followers where following = $1", [id]).first
   @user = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [id]).first
+  @followed = db.exec_params("select count(*) from followers where followed = $1", [id]).first
+  @following = db.exec_params("select count(*) from followers where following = $1", [id]).first
+  @follow = db.exec_params("select * from followers where following = $1 and followed = $2", [session[:id], id]).first
+  binding.pry
   erb :user
 end
 
-# ユーザー情報
+# フォロー処理
 ###########################################################################
 post '/follow' do
-  followed = db.exec_params("select * from followers where following = $1", [id]).first
+  following = session[:id]
+  followed = params[:id]
+  to_follow = db.exec_params("select * from followers where following = $1 and followed = $2", [following, followed]).first
+  if to_follow
+    db.exec_params("delete from followers where id = $1", [to_follow['id']])
+  else
+    db.exec_params("insert into followers(following, followed) values($1, $2)", [following, followed])
+  end
+  redirect "/users/#{followed}"
 end
 
 # マイページ
