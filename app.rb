@@ -245,8 +245,14 @@ get '/posts' do
         redirect 'mypage' if params['id'] == session[:id] # ログインしているユーザーがユーザー詳細ページへアクセスしようとしたらマイページへリダイレクトする
         id = params['id']
         #アクセスしたユーザーの詳細情報取得 to_charは100行目付近の説明を参照
-        @user = db.exec_params("select users.id, users.name, users.image, users.introduce, users.birthday, to_char(users.created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [id]).first
-        @posts = db.exec_params("select title, content, image, to_char(created_at, 'yyyy/mm/dd') as created_at,to_char(updated_at, 'yyyy/mm/dd') as updated_at from posts where user_id = $1 order by updated_at desc", [id]) #ユーザーに紐付いている投稿データを取得
+        @user = db.exec_params("
+          select users.id, users.name, users.image, users.introduce, users.birthday, to_char(users.created_at, 'yyyy/mm/dd') as created_at
+          from users where id = $1", [id]).first
+        #ユーザーに紐付いている投稿データを取得
+        @posts = db.exec_params("
+          select title, content, image, to_char(created_at, 'yyyy/mm/dd') as created_at,to_char(updated_at, 'yyyy/mm/dd') as updated_at
+          from posts where user_id = $1
+          order by updated_at desc", [id]) #更新日時を降順で並び替える
         @followed = db.exec_params("select count(*) from followers where followed = $1", [id]).first #フォロワーの総数
         @following = db.exec_params("select count(*) from followers where following = $1", [id]).first #フォロー中の総数
         #ログイン中のユーザーが詳細ページのユーザーをフォローしているか取得
@@ -274,6 +280,10 @@ get '/posts' do
       # マイページ
       ###########################################################################
       get '/mypage' do
+        @posts = db.exec_params("
+          select title, content, image, to_char(created_at, 'yyyy/mm/dd') as created_at,to_char(updated_at, 'yyyy/mm/dd') as updated_at
+          from posts where user_id = $1
+          order by updated_at desc", [session[:id]]) #更新日時を降順で並び替える
         erb :mypage
       end
       #この2つのエンドポイントはbeforeメソッドでユーザー情報を取得する処理を記述しているため、
