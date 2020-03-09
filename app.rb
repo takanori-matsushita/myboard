@@ -18,12 +18,16 @@ end
 # 共通の処理
 ###########################################################################
 before do
-  unless request.path == '/login' || request.path == '/signup' || session[:id]
+  unless request.path == '/' || request.path == '/login' || request.path == '/signup' || session[:id]
     session[:notice] = {key: "danger", message: "ログインして下さい"}
     redirect '/login'
   end
   @admin = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1",[session[:id]]).first
   @message = session.delete :notice
+end
+
+get '/' do
+  erb :index
 end
 
 # サインアップ処理
@@ -45,6 +49,7 @@ end
 # ログイン処理
 ###########################################################################
 get '/login' do
+  redirect '/posts' if session[:id]
   erb :login
 end
 
@@ -67,7 +72,7 @@ end
 get '/logout' do
   session.clear
   session[:notice] = {key: "danger", message: "ログアウトしました"}
-  redirect '/login'
+  redirect '/'
 end
 
 # 投稿機能
@@ -186,7 +191,7 @@ get '/users' do
   @users = db.exec_params("select * from users where not id = $1 order by created_at desc", [session[:id]])
   @anyfollowed = db.exec_params("select followed, count(followed) as count_followed from followers group by followed")
   @anyfollowing = db.exec_params("select following, count(following) as count_following from followers group by following")
-  binding.pry
+  # binding.pry
   erb :users
 end
 
