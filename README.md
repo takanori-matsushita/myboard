@@ -16,10 +16,22 @@ CODEBASE受講生向けの簡易SNSサンプル
  
 ### データベース構築
 詳しいSQLの内容については、[#2データベース作成時のSQL文の解説](https://github.com/takanori-matsushita/myboard/issues/2)を参照
+
+データベースにログイン
+```
+Macの方
+psql -d postgres
  
+Windowsの方
+psql -d postgres -U lagoon
+```
 データベースの作成
 ```
 CREATE DATABASE myboard;
+```
+作成したデータベースに切り替える
+```
+\c myboard
 ```
 ユーザーテーブルの作成
 ```
@@ -39,7 +51,7 @@ CREATE TABLE users(
 ```
 CREATE TABLE posts(
   id SERIAL NOT NULL PRIMARY KEY,
-  users_id INTEGER NOT NULL,
+  user_id INTEGER NOT NULL,
   title VARCHAR(20) NOT NULL,
   content VARCHAR(255) NOT NULL,
   image VARCHAR(50),
