@@ -23,7 +23,7 @@ Macの方
 psql -d postgres
  
 Windowsの方
-psql -d postgres -U lagoon
+psql -d postgres -U 任意のユーザー名(codebase, lagoon)
 ```
 データベースの作成
 ```
@@ -139,10 +139,27 @@ def db
   ) 
 end
 ```
-シェルがbashならホームディレクトリの`.bash_profile`ファイル、zshなら`.zshenv`ファイルに以下のように記述し保存する。
+### 設定の手順
+以下の通りに実行していく。
+1. ホームディレクトリへ移動
+```
+cd ~
+```
+2. シェルがbashの場合
+```
+vim .bash_profile
+```
+2. シェルがzshの場合
+```
+vim .zshenv
+```
+3. iキーを押し,インサートモードに入り、以下を入力
 ```
 export DB_HOST='localhost'
 export DB_USER='' whoamiで表示されたuser名
 export DB_PASSWORD=''
 export DB_NAME='myboard' データベース名
 ```
+4. escキーでノーマルモードに戻り、:wq enterの順にキーを押す。
+5. 開いているすべてのターミナルを終了させる。
+6. 通常通りruby app.rb でアプリを起動する。
