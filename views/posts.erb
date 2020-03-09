@@ -19,8 +19,12 @@
       <% if post['user_id'] == session[:id] %>
       <td><a class="btn btn-success" href="/posts/<%= post['id'] %>/edit">編集</a>
       </td>
-      <td><a class="btn btn-danger" href="/posts/<%= post['id'] %>/destroy"
-          onclick="return confirm('本当に削除しますか？')">削除</a></td>
+      <td>
+        <form action="/posts/<%= post['id'] %>/destroy" method="post">
+          <input type="hidden" name="id" value="<%= post['id'] %>">
+          <button type="submit" class="btn btn-danger" onclick="return confirm('本当に削除しますか？')">削除</button>
+      </td>
+      </form>
       <% else %>
       <td></td>
       <td></td>

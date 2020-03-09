@@ -4,7 +4,10 @@
   <% if @post['user_id'] == session[:id] %>
   <div>
     <a class="btn btn-success" href="/posts/<%= @post['id'] %>/edit">編集</a>
-    <a class="btn btn-danger" href="/posts/<%= @post['id'] %>/destroy" onclick="return confirm('本当に削除しますか？')">削除</a>
+    <form action="/posts/<%= @post['id'] %>/destroy" method="post" class="d-inline">
+      <input type="hidden" name="id" value="<%= @post['id'] %>">
+      <button class="btn btn-danger" onclick="return confirm('本当に削除しますか？')">削除</button>
+    </form>
   </div>
   <% end %>
 </div>
