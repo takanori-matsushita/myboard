@@ -4,9 +4,9 @@ require 'sinatra/cookies'
 require 'pg'
 require 'pry'
 
-enable :sessions
+enable :sessions #ログイン機能を使用するにはセッションを有効にしなければいけない
 
-def db
+def db #データベースへの接続の設定
   PG::connect(
     host: ENV['DB_HOST'],
     user: ENV['DB_USER'],
@@ -19,7 +19,7 @@ end
 ###########################################################################
 #beforeはすべてのエンドポイントで実行する処理を記述する
 before do
-  #アクセスしたパスが"/","/signup","/login"以外とログインしていなければ、"/login"ページに遷移させる
+  #アクセスしたパスが"/"もしくは、"/signup"もしくは、"/login"もしくは、ログインしていなければ、"/login"ページに遷移させる
   unless request.path == '/' || request.path == '/login' || request.path == '/signup' || session[:id]
     session[:notice] = {key: "danger", message: "ログインして下さい"}
     redirect '/login'
@@ -93,7 +93,7 @@ end
 ###########################################################################
 get '/posts' do
   #投稿一覧を取得する
-  #投稿に紐付いているユーザーネームも取得したいため、inner joinでテーブルを結合する
+  #投稿に紐付いているユーザー名も取得したいため、inner joinでテーブルを結合する
   #to_charはデータ型がTIMESTAMPだと秒数まで取得して保存されるため、何時何分まで表示させるためのSQLの関数
   @posts = db.exec_params("
     select posts.id, posts.user_id, users.name, posts.title, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
@@ -112,7 +112,7 @@ get '/posts' do
     title = params[:title]
     content = params[:content]
     if params[:image].nil? #もし画像が投稿されていない場合
-      #insertするカラムを以下のように指定する
+      #insert処理を以下のカラムのように指定する
       db.exec_params("insert into posts(title, content, user_id) values($1, $2, $3)",[title, content, session[:id]])
     else #画像が投稿されている場合
       image_name = params[:image][:filename] #画像のファイル名を取得し変数へ代入する
@@ -128,9 +128,8 @@ get '/posts' do
   get '/posts/:id' do
     #投稿詳細ページ
     id = params[:id]
-    #個別の投稿情報を取得する
-    #投稿したユーザーの情報も取得したいのでinner join でテーブルを結合する
-    #取得したデータは配列になっているのでfirstで一番目のデータを取得して変数へ代入する
+    #個別の投稿情報を取得する。投稿したユーザーの情報も取得したいのでinner join でテーブルを結合する
+    #取得したデータは配列になっているのでfirstで一番目のデータを取得して変数へ代入する to_charは100行目付近の説明を参照
     @post = db.exec_params("
       select posts.id, posts.user_id, users.name, posts.title, posts.content, posts.image, posts.created_at, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
       inner join users on users.id = posts.user_id
@@ -140,19 +139,19 @@ get '/posts' do
     @like_count = db.exec_params("select count(*) from likes where post_id = $1", [id]).first
     #ログインしているユーザーがいいねしているか確認する
     @liked = db.exec_params("select * from likes where user_id = $1 and post_id = $2", [session[:id], id]).first
-    #投稿に対するコメントをwhereで取得し変数へ代入
+    #投稿に対するコメントをwhereで取得し変数へ代入、to_charは100行目付近の説明を参照
     @comments = db.exec_params("
       select comments.id, comments.post_id, users.name, users.image, comments.content, to_char(comments.created_at, 'yyyy/mm/dd hh24:mm:ss') as created_at from comments
       inner join users on comments.user_id = users.id
       inner join posts on comments.post_id = posts.id
-      where post_id = $1
+      where post_id = $1 --投稿に紐付いているコメントだけをしていする
       order by created_at desc", [id]) #orderを使って投稿日時を降順に並び替える
       erb :post
     end
     
     get '/posts/:id/edit' do
       id = params[:id]
-      #新規投稿時のデータを取得し、変数へ代入
+      #新規投稿時のデータを取得し、変数へ代入 to_charは100行目付近の説明を参照
       @post = db.exec_params("
         select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
         inner join users on users.id = posts.user_id
@@ -238,15 +237,16 @@ get '/posts' do
             group by users.id, f2.following_count
           ) as c_followers on users.id = c_followers.user_id
           where not id = $1
-          order by created_at desc", [session[:id]]) 
+          order by created_at desc", [session[:id]])
         erb :users
       end
       
       get '/users/:id' do
         redirect 'mypage' if params['id'] == session[:id] # ログインしているユーザーがユーザー詳細ページへアクセスしようとしたらマイページへリダイレクトする
         id = params['id']
-        #アクセスしたユーザーの詳細情報を取得、to_charは上記でコメントしているので省略
-        @user = db.exec_params("select *, to_char(created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [id]).first
+        #アクセスしたユーザーの詳細情報取得 to_charは100行目付近の説明を参照
+        @user = db.exec_params("select users.id, users.name, users.image, users.introduce, users.birthday, to_char(users.created_at, 'yyyy/mm/dd') as created_at from users where id = $1", [id]).first
+        @posts = db.exec_params("select title, content, image, to_char(created_at, 'yyyy/mm/dd') as created_at,to_char(updated_at, 'yyyy/mm/dd') as updated_at from posts where user_id = $1 order by updated_at desc", [id]) #ユーザーに紐付いている投稿データを取得
         @followed = db.exec_params("select count(*) from followers where followed = $1", [id]).first #フォロワーの総数
         @following = db.exec_params("select count(*) from followers where following = $1", [id]).first #フォロー中の総数
         #ログイン中のユーザーが詳細ページのユーザーをフォローしているか取得
@@ -289,7 +289,7 @@ get '/posts' do
         password = params[:password]
         birthday = params[:birthday]
         introduce = params[:introduce]
-        begin #例外処理のはじまり
+        begin #以下の処理を実行してエラーが帰ってくるようであればrescueで例外処理をする
           if params[:image].nil? #もしプロフィール画像がアップロードされていない場合
             if password.empty? #かつパスワードも入力されていない場合、imageカラムとpasswordカラム以外の値を更新する
               db.exec_params("update users set name = $1, email = $2, birthday = $3, introduce = $4 where id = $5", [name, email, birthday, introduce, session[:id]])
@@ -306,7 +306,7 @@ get '/posts' do
               db.exec_params("update users set name = $1, email = $2, password = $3 birthday = $4, introduce = $5, image = $6 where id = $7", [name, email, password, birthday, introduce, image_name, session[:id]])
             end
           end
-        rescue PG::UniqueViolation #例外処理 emailにuniqueを設定しているため、通常だとエラー画面が表示されるが、例外処理を記述することで、エラーに対する処理を実行できる
+        rescue PG::UniqueViolation #例外処理 emailにuniqueを設定しているため、PG::UniqueViolationというエラーが表示されるが、例外処理を記述することで、エラーに対する処理を実行できる
           session[:notice] = {key: "danger", message: "そのメールアドレスはすでに利用されています。"} #メールアドレスが重複している際のフラッシュメッセージ
           redirect '/mypage/edit' #マイページの編集ページへリダイレクト
         end
@@ -318,7 +318,7 @@ get '/posts' do
       ###########################################################################
       get '/search' do
         success '/posts' if params[:q].empty? #検索キーワードが入力されていない場合、投稿一覧へリダイレクト
-        @keywords = params[:q].split(/[[:blank:]]+/) #キーワードが空白で複数入力されている場合、空白で区切って配列に変換し、変数へ代入する
+        @keywords = params[:q].split(/[[:blank:]]+/) #キーワードが空白で複数入力されている場合、空白で区切って配列に変換し、変数へ代入する 空白の判定は正規表現で実装
         @results = [] #以下の処理で使用するための配列を用意
         @keywords.each_with_index do |keyword| #複数のキーワードで検索するため、キーワードをeachで回して処理を行う
           next if keyword == "" #配列の一番最初が空白だった場合、次の配列の処理に移る。空白だった場合も空のデータとして取れてしまうため
@@ -330,6 +330,6 @@ get '/posts' do
             @results << a #@results変数に検索結果を追加する
           end
         end
-        @url = request.fullpath #"/search"のフルパスを取得し、変数へ代入
+        @url = request.fullpath #"/search"のフルパスを取得し、変数へ代入 search.erbで条件分岐として使用する
         erb :search
       end
