@@ -17,7 +17,7 @@
 <div class="row">
   <div class="col-sm-4 offset-4">
     <div class="d-flex flex-column align-items-center">
-      <form action="/likes" method="post">
+      <form action="/likes/<%= @post['id'] %>" method="post">
         <input type="hidden" name="id" value="<%= @post['id'] %>">
         <a href="javascript:void(0)" onclick="this.parentNode.submit()">
           <% if @liked %>
