@@ -1,6 +1,18 @@
 # 簡易掲示板
 CODEBASE受講生向けの簡易SNSサンプル
  
+# 今は気にしなくていいファイル
+- Gemfile
+- Gemfile.lock
+- Procfile
+- config.ru
+ 
+Model.mwbは、MySQLWorkBenchのER図作成時のファイル
+ 
+# herokuで確認する方法
+以下のURLにアクセス
+[https://cbsns.herokuapp.com/](https://cbsns.herokuapp.com/)
+ 
 # クローンしてローカルで確認する方法
 1. ターミナルを起動し、保存したいパス・ディレクトリへ移動。
 2. `git clone https://github.com/takanori-matsushita/myboard.git`を実行。
