@@ -20,7 +20,7 @@ end
 enable :sessions #ログイン機能を使用するにはセッションを有効にしなければいけない
 
   def db #データベースへの接続の設定
-    PG::connect(
+    @db ||= PG::connect(
       host: ENV['DB_HOST'],
       port: ENV['DB_PORT'],
       user: ENV['DB_USER'],
