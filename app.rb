@@ -12,13 +12,23 @@ end
 
 enable :sessions #ログイン機能を使用するにはセッションを有効にしなければいけない
 
-def db #データベースへの接続の設定
-  PG::connect(
-    host: ENV['DB_HOST'],
-    user: ENV['DB_USER'],
-    password: ENV['DB_PASSWORD'],
-    dbname: ENV['DB_NAME']
-  ) 
+if development?
+  def db #データベースへの接続の設定
+    PG::connect(
+      host: ENV['DB_HOST'],
+      user: ENV['DB_USER'],
+      password: ENV['DB_PASSWORD'],
+      dbname: ENV['DB_NAME']
+    ) 
+  end
+end
+
+if production?
+  def db #データベースへの接続の設定
+    @db ||= PG.connect(
+      dbname: ENV['DB_NAME']
+    )
+  end
 end
 
 # 共通の処理
