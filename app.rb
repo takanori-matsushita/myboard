@@ -1,8 +1,14 @@
-require 'sinatra'
-require 'sinatra/reloader'
-require 'sinatra/cookies'
-require 'pg'
-require 'pry'
+# require 'sinatra' #sinatraを使用するためにgemを読み込む
+# require 'sinatra/reloader' #sinatraでファイルを変更・保存した際にサーバーを立ち上げ直さなくても自動でリロードしてくれる
+# require 'sinatra/cookies' #クッキーを使用する
+# require 'pg' #PostgreSQLに接続するためのgem
+# require 'pry' #デバッグの際に使用するgem
+require "bundler/setup"
+Bundler.require
+
+if development?
+  require 'sinatra/reloader'
+end
 
 enable :sessions #ログイン機能を使用するにはセッションを有効にしなければいけない
 
