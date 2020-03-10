@@ -25,7 +25,7 @@ end
 
 if production?
   def db #データベースへの接続の設定
-    @db ||= PG.connect(
+    PG.connect(
       dbname: ENV['DB_NAME']
     )
   end
