@@ -11,9 +11,9 @@
   </div>
   <% end %>
 </div>
-<h3 class="mb-3"><%= @post['title'] %></h3>
-<img src="/images/<%= @post['image'] %>" class="img-fluid mb-3">
-<p><%= @post['content'] %></p>
+<h3 class="mb-3"><%= h @post['title'] %></h3>
+<img src="/images/<%= h @post['image'] %>" class="img-fluid mb-3">
+<p><%= h @post['content'] %></p>
 <div class="row">
   <div class="col-sm-4 offset-4">
     <div class="d-flex flex-column align-items-center">
@@ -31,7 +31,7 @@
     </div>
   </div>
   <div class="col-sm-4">
-    <p class="text-right">投稿者:<a href="/users/<%= @post['user_id'] %>"><%= @post['name'] %></a></p>
+    <p class="text-right">投稿者:<a href="/users/<%= @post['user_id'] %>"><%= h @post['name'] %></a></p>
     <p class="text-right"><%= @post['updated_at'] %></p>
   </div>
 </div>
@@ -53,10 +53,10 @@
     <ul class="list-unstyled">
       <% @comments.each do |comment| %>
       <li class="media border-bottom border-secondary mb-5">
-        <img src="/images/<%= comment['image'] %>" width="100" class="mr-3 rounded-circle">
+        <img src="/images/<%= h comment['image'] %>" width="100" class="mr-3 rounded-circle">
         <div class="media-body">
-          <p><%= comment['name'] %></p>
-          <p><%= comment['content'] %></p>
+          <p><%= h comment['name'] %></p>
+          <p><%= h comment['content'] %></p>
           <p class="text-right"><%= comment['created_at'] %></p>
         </div>
       </li>

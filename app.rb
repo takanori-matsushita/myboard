@@ -7,10 +7,14 @@
 # require 'pry' #デバッグの際に使用するgem
 ###########################################################################
 
-#このあたりは今は気にしなくていい（デプロイ時の設定）
-#もし気になるなら、bundlerを調べてみると良い
-#ローカルで動作確認したい時は、以下の行をすべてコメントアウトする
+
+
+
+
+# デプロイ設定(ここから)
 ###########################################################################
+#このあたりは今は気にしなくていい（デプロイ時の設定）
+#ローカルで動作確認したい時は、ここから
 require "bundler/setup"
 Bundler.require
 
@@ -19,12 +23,28 @@ if development?
   require 'sinatra/reloader'
   require 'pry'
 end
+#ここまでの行をすべてコメントアウトする
+
+# XSS対策(悪意のある利用者がhtmlタグやscriptタグを埋め込むのを防ぐ)
+#このあたりも今は気にしなくていい（デプロイ時の設定）
+helpers do
+  include Rack::Utils
+  alias_method :h, :escape_html
+end
 ###########################################################################
+# デプロイ設定(ここまで)
+
+
+
+
 
 #ログイン機能を使用するために、セッションを有効にする
+###########################################################################
 enable :sessions
 
-  def db #データベースへの接続の設定
+# データベースへの接続の設定
+###########################################################################
+  def db
     #もし@dbが偽であれば、データベースへの接続情報を代入する
     #この書き方は、デプロイした際に、PG::ConnectionBad - FATAL: too many connectionsエラーが出るためその対策
     @db ||= PG::connect(
@@ -116,7 +136,7 @@ end
 ###########################################################################
 get '/posts' do
   #投稿一覧を取得する
-  #投稿に紐付いているユーザー名も取得したいため、inner joinでテーブルを結合する to_charは50行目付近の説明を参照
+  #投稿に紐付いているユーザー名も取得したいため、inner joinでテーブルを結合する to_charは70行目付近の説明を参照
   @posts = db.exec_params("
     select posts.id, posts.user_id, users.name, posts.title, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at
     from posts
@@ -152,7 +172,7 @@ get '/posts/:id' do
   #投稿詳細ページ
   id = params[:id]
   #個別の投稿情報を取得する。投稿したユーザーの情報も取得したいのでinner join でテーブルを結合する
-  #取得したデータは配列になっているのでfirstで一番目のデータを取得して変数へ代入する to_charは50行目付近の説明を参照
+  #取得したデータは配列になっているのでfirstで一番目のデータを取得して変数へ代入する to_charは70行目付近の説明を参照
   @post = db.exec_params("
     select posts.id, posts.user_id, users.name, posts.title, posts.content, posts.image, posts.created_at, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
     inner join users on users.id = posts.user_id
@@ -174,7 +194,7 @@ end
   
 get '/posts/:id/edit' do
   id = params[:id]
-  #新規投稿時のデータを取得し、変数へ代入 to_charは50行目付近の説明を参照
+  #新規投稿時のデータを取得し、変数へ代入 to_charは70行目付近の説明を参照
   @post = db.exec_params("
     select posts.*, users.name, to_char(posts.updated_at, 'yyyy/mm/dd hh24:mm:ss') as updated_at from posts
     inner join users on users.id = posts.user_id
@@ -268,7 +288,7 @@ end
 get '/users/:id' do
   redirect 'mypage' if params['id'] == session[:id] # ログインしているユーザーがユーザー詳細ページへアクセスしようとしたらマイページへリダイレクトする
   id = params['id']
-  #アクセスしたユーザーの詳細情報取得 to_charは50行目付近の説明を参照
+  #アクセスしたユーザーの詳細情報取得 to_charは70行目付近の説明を参照
   @user = db.exec_params("
     select users.id, users.name, users.image, users.introduce, users.birthday, to_char(users.created_at, 'yyyy/mm/dd') as created_at
     from users where id = $1", [id]).first

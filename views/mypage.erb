@@ -2,22 +2,22 @@
 <div class="row mb-5">
   <div class="col-3">
     <img src="/images/<%= @admin['image'] %>" class="rounded-circle img-fluid mb-3">
-    <h2 class="text-center"><%= @admin['name'] %></h2>
+    <h2 class="text-center"><%= h @admin['name'] %></h2>
   </div>
   <div class="col-6 offset-3">
     <dl>
       <dt>メールアドレス</dt>
-      <dd><%= @admin['email'] %></dd>
+      <dd><%= h @admin['email'] %></dd>
       <dt>パスワード</dt>
-      <dd><%= @admin['password'] %></dd>
+      <dd><%= h @admin['password'] %></dd>
       <dt>誕生日</dt>
       <% if @admin['birthday'].nil? %>
       <dd>非公開</dd>
       <% else %>
-      <dd><%= @admin['birthday'] %></dd>
+      <dd><%= h @admin['birthday'] %></dd>
       <% end %>
       <dt>自己紹介</dt>
-      <dd><%= @admin['introduce'] %></dd>
+      <dd><%= h @admin['introduce'] %></dd>
       <dt>登録日</dt>
       <dd><%= @admin['created_at'] %></dd>
     </dl>
@@ -32,8 +32,9 @@
         <li class="media border-bottom border-secondary mb-5">
           <img src="/images/<%= post['image'] %>" width="100" class="mr-3 rounded-circle">
           <div class="media-body">
-            <p><%= post['name'] %></p>
-            <p><%= post['content'] %></p>
+            <h2><%= h post['title'] %></h2>
+            <p><%= h post['name'] %></p>
+            <p><%= h post['content'] %></p>
             <p class="text-right">更新日：<%= post['updated_at'] %></p>
           </div>
         </li>

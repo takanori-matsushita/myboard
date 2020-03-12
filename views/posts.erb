@@ -12,9 +12,9 @@
     </tr>
     <% @posts.each do |post| %>
     <tr>
-      <td><%= post['name'] %></td>
-      <td><%= post['title'] %></td>
-      <td><%= post['updated_at'] %></td>
+      <td><%= h post['name'] %></td>
+      <td><%= h post['title'] %></td>
+      <td><%= h post['updated_at'] %></td>
       <td><a class="btn btn-info" href="/posts/<%= post['id'] %>">詳細</a></td>
       <% if post['user_id'] == session[:id] %>
       <td><a class="btn btn-success" href="/posts/<%= post['id'] %>/edit">編集</a>
